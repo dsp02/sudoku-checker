@@ -5,7 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-import com.rmgroup.sudoku.Sudoku.SolutionValidity;
+import com.rmgroup.sudoku.Sudoku.Status;
 
 public class Validate {
 	
@@ -19,14 +19,16 @@ public class Validate {
 
 		if (!filePath.isPresent()) 
 			throw new IllegalArgumentException("ERROR: Input file not detected");
-		
-		// Now check it.
-		Sudoku sudoku = Sudoku.getInstance();
-		SolutionValidity validity = SolutionValidity.INVALID;
-		
-		try {
-			validity = sudoku.check(filePath.get());
-		} catch (IllegalArgumentException | IndexOutOfBoundsException ex ) {
+
+		// Start with assumption of incorrect solution.
+		Status validity = Status.INVALID;
+
+		// Now check it.				
+		try {			
+			validity = Sudoku.getInstance()
+					         .check(filePath.get());			
+		} catch (IllegalArgumentException |
+				 IndexOutOfBoundsException ex ) {
 			System.out.println(ex.getMessage());
 		}
 		
