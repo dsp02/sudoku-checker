@@ -1,5 +1,6 @@
 package com.rmgroup.sudoku;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,17 +21,24 @@ public class Validate {
 		if (!filePath.isPresent()) 
 			throw new IllegalArgumentException("ERROR: Input file not detected");
 
-		// Start with assumption of incorrect solution.
+		// Assume solution is incorrect and determine otherwise.
 		Status validity = Status.INVALID;
+		
+		// A Sudoku Grid of 9 x 9.
+		int sudokuDimension = 9;
+				
+		try {
+			// Read contents of the CSV file.
+			SudokuReader csvReader = new CsvReader(filePath.get(), sudokuDimension);
+			Integer[][] sudokuGrid = csvReader.getGrid();
 
-		// Now check it.				
-		try {			
-			validity = Sudoku.getInstance()
-					         .check(filePath.get());			
-		} catch (IllegalArgumentException |
-				 IndexOutOfBoundsException ex ) {
+			// inject & check.
+			validity = Sudoku.getInstance().check(sudokuGrid);
+		
+		} catch (IllegalArgumentException | IndexOutOfBoundsException| IOException ex ) {
 			System.out.println(ex.getMessage());
 		}
+
 		
 		// Inform user of the result. 
 		System.out.println("The solution: " + filePath.get() + " is " + validity.name());
@@ -47,6 +55,5 @@ public class Validate {
 			return Optional.of(Paths.get(paths[0]));
 		else
 			return Optional.empty();
-	}
-	
+	}	
 }

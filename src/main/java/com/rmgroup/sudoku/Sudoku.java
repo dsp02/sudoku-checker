@@ -44,26 +44,28 @@ public class Sudoku {
        return new Sudoku();
     }
 
+
     /**
-     * Checks whether the Sudoku Solution and provides an answer as to whether it is 
-     * a valid solution or an invalid solution according to Sudoku rules.
-     *  
-     * @return {@code VALID} if it is a Sudoku solution, {@code INVALID} otherwise. 
+     * Checks Sudoku Solution and provides an answer as to whether it is 
+     * a valid or an invalid solution according to Sudoku rules.
+     * 
+     * @param sudokuGrid to be checked.
+     * @return {@code VALID} if the solution meets the Sudoku rules, INVALID otherwise.
      */
-    public Status check(final Path sudokuFilePath) {
-	
-       Status result = Status.VALID;
+      public Status check(final Integer[][] sudokuGrid) {
+         Status result = Status.VALID;
 
-       Integer[][] sudokuGrid = getSudokuValues(sudokuFilePath).get();
-
-       // Now perform Sudoku checks
+       // Perform each Sudoku check.
        result = checkAllRows(sudokuGrid);
+       
        result = checkAllColumns(result, sudokuGrid);
+       
        result = checkAllSubGrids(result, sudokuGrid, SUBGRID_DIMENSION);
 
        return result;
     }
 
+      
     /**
      * Checks whether all columns in the grid are valid according to Sudoku rules.
      * @param result holds the current status of previous checks. 
@@ -76,7 +78,9 @@ public class Sudoku {
    
        // transpose the grid then we can just check rows!
        if (result.equals(Status.VALID)) {
+    	   
           Integer[][] columnView = transpose(grid);
+          
           currentResult = checkAllRows(columnView);
        }
        return currentResult;
@@ -92,7 +96,7 @@ public class Sudoku {
 	
         Status answer = Status.VALID;
 
-        for(int row = 0; row < grid.length; row++) {
+        for(int row = 0; row < grid.length; row++) {        	
            if (answer.equals(Status.VALID) && !isSudokuLine(grid[row])) {
               answer = Status.INVALID;	
            }
@@ -125,7 +129,7 @@ public class Sudoku {
         return currentResult;
      }
 
-	
+
     /**
      * Copies the specified range of the specified array into a new array.
      * @param fromRow the initial row of the range to be copied, inclusive
@@ -165,8 +169,8 @@ public class Sudoku {
      * Checks that {@code fromRow}, {@code fromCol} and {@code dimension} are in
      * the range, throws an exception if they are not.
      */
-     private void gridRangeCheck(final Integer fromRow, 
-        final Integer fromCol, final Integer dimension, final Integer[][] parent) {
+     private void gridRangeCheck(
+    		 final Integer fromRow, final Integer fromCol, final Integer dimension, final Integer[][] parent) {
         
         if (parent == null) {
            throw new IllegalArgumentException("ERROR: parent grid cannot be null");
@@ -305,44 +309,4 @@ public class Sudoku {
         }
      }
 	
-    /**
-     * Extracts the Sudoku values from the provided solution file.
-     * @param file 
-     * @return A grid containing the values.
-     */
-     protected Optional<Integer[][]> getSudokuValues(final Path file) {	
-        Integer[][] sudokuValues = new Integer[GRID_DIMENSION][GRID_DIMENSION];
-
-        try (Stream<String> lines = Files.lines(file))  {
-           AtomicInteger rowNumber = new AtomicInteger(0);
-           lines.forEach((row) -> 
-              sudokuValues[rowNumber.getAndIncrement()] = extractCellValues(row)
-           );
-        } catch (IOException ioe) {
-           return Optional.empty();
-        }
-
-        return Optional.of(sudokuValues);
-     }
-
-    /**
-     * Extracts and validates values from the given line of data.
-     * @param line to extract the values from.
-     * @return a row of validated values within the specified range. 
-     */
-     private Integer[] extractCellValues(final String line) {
-	
-        String[] cellValues = line.split(",");		
-
-        if (!isWithinRange(cellValues, 1, GRID_DIMENSION)) 
-           throw new IllegalArgumentException("ERROR: cell values are not in range");
-	
-        IntStream intValues = Stream.of(cellValues)
-                                    .mapToInt(rawValue -> Integer.parseInt(rawValue));
-
-        Integer[] row = intValues.boxed()
-                                 .collect(Collectors.toList())
-                                 .toArray(new Integer[0]);
-        return row;
-     }
 }

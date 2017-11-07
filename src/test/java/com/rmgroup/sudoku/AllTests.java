@@ -10,7 +10,10 @@ import org.junit.runners.Suite.SuiteClasses;
 	IsSudokuGrid.class,
 	ValidateRowsTest.class,
 	SubGridTest.class,
-	TransposeTest.class
+	TransposeTest.class,
+	IsInRangeTest.class,
+	CleansedRowTest.class,
+	ExtractCellValuesTest.class
 })
 public class AllTests {
 }
